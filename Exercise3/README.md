@@ -291,22 +291,114 @@ Wireframes показывают основной путь пользовател
 
 # 4. API-First: JSON-контракты
 
-API-First означает, что фронтенд и бэкенд заранее договариваются о формате запросов и ответов.
+API-First означает, что фронтенд и бэкенд заранее договариваются, какие данные отправляются и какие данные возвращаются.
 
-Для MVP проекта **Recipe from Fridge** выбраны две основные API-ручки:
+Для MVP проекта Recipe from Fridge выбраны две основные API-ручки:
 
 1. Добавление продукта в холодильник.
 2. Подбор рецептов по продуктам.
 
----
-
-## 4.1. API-ручка: добавление продукта в холодильник
-
-### Назначение
-
-Добавляет продукт в список продуктов пользователя.
+## 4.1. Добавление продукта в холодильник
 
 ### Метод
 
 ```http
 POST /api/v1/fridge/items
+```
+
+### Назначение
+
+Ручка добавляет продукт в список продуктов пользователя.
+
+### Request JSON
+
+```json
+{
+  "userId": "user_123",
+  "productName": "яйца",
+  "quantity": 10,
+  "unit": "шт",
+  "expirationDate": "2026-02-15"
+}
+```
+
+### Response JSON
+
+```json
+{
+  "success": true,
+  "item": {
+    "id": "item_001",
+    "productName": "яйца",
+    "quantity": 10,
+    "unit": "шт",
+    "expirationDate": "2026-02-15"
+  },
+  "message": "Продукт добавлен в холодильник"
+}
+```
+
+---
+
+## 4.2. Подбор рецептов
+
+### Метод
+
+```http
+POST /api/v1/recipes/search-by-fridge
+```
+
+### Назначение
+
+Ручка возвращает список рецептов, которые подходят под продукты пользователя.
+
+### Request JSON
+
+```json
+{
+  "userId": "user_123",
+  "fridgeItems": [
+    {
+      "productName": "яйца",
+      "quantity": 10,
+      "unit": "шт"
+    },
+    {
+      "productName": "молоко",
+      "quantity": 1,
+      "unit": "л"
+    },
+    {
+      "productName": "сыр",
+      "quantity": 200,
+      "unit": "г"
+    }
+  ],
+  "maxMissingIngredients": 2,
+  "maxCookingTimeMinutes": 30
+}
+```
+
+### Response JSON
+
+```json
+{
+  "success": true,
+  "recipes": [
+    {
+      "id": "recipe_001",
+      "title": "Омлет с сыром",
+      "cookingTimeMinutes": 15,
+      "matchPercent": 85,
+      "availableIngredients": [
+        "яйца",
+        "молоко",
+        "сыр"
+      ],
+      "missingIngredients": [
+        "зелень"
+      ]
+    }
+  ]
+}
+```
